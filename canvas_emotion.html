@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>canvas制作表情包</title>
+	<meta charset="utf8">
+  <style>
+  *{margin:0;padding:0;}
+  .emotion_all{width:500px;margin:30px auto;}
+  .tips{font-size:14px;color:#f00;}
+
+  #image_container {position:relative;margin-top:20px;display:flex;}
+#c{border:1px solid #000;}
+.images_txt{font-size:14px;color:#333;position:absolute;top:20px;left:30px;}
+.image_right{margin-left:20px;font-size:14px;}
+#saveBtn{display:block;margin-top:20px;width:50px;height:30px;background:#4283ef;color:#fff;border:none;}
+  </style>
+</head>
+<body>
+<div class="emotion_all">
+  <div class='btns'>
+  <p class='tips'>1.选择一张您要生成表情的图片</p>
+    <input type="file" id='file' />
+</div>
+<div id="image_container">
+   <span class='images_txt'>这里生成您的表情...</span>
+   <canvas id='c' width="200" height='200'></canvas>
+   <div class='image_right'>
+   <p class='tips'>2.添加您需要的文字</p>
+     <p>头部文字：</p>
+     <input type="text" id="topLineText">
+     <p style="margin-top:20px;">底部文字：</p>
+     <input id="bottomLineText" type="text">
+     <button id="saveBtn">生成</button>
+   </div>
+  </div>
+</div>   
+   <script type="text/javascript">
+     function textChangeListener(evt){
+       var id = evt.target.id;
+       var text = evt.target.value;
+
+       if(id == "topLineText"){
+         window.topLineText = text;
+       }else{
+        window.bottomLineText = text;
+       }
+
+       redrawMeme(window.imageSrc,window.topLineText,window.bottomLineText);
+     }
+
+     function redrawMeme(image,topLine,bottomLine){
+       var c = document.querySelector('#c');
+       var ctx = c.getContext('2d');
+       if(image!=null){
+        ctx.drawImage(image,0,0,c.width,c.height);
+
+        ctx.font = "30pt Impact";
+        ctx.textAlign = "center";
+        ctx.strokeStyle = "black";
+        ctx.lineWidth = 1;
+        ctx.fillStyle = "red";
+
+        if(topLine!=null){
+          ctx.fillText(topLine,c.width/2,40);
+          ctx.strokeText(topLine,c.width/2,40);
+        }
+        if(bottomLine!=null){
+          ctx.fillText(bottomLine,c.width/2,c.height-20);
+          ctx.strokeText(bottomLine,c.width/2,c.height-20);
+        }
+       }
+     }
+      
+      function saveFile(){
+        window.open(document.querySelector('canvas'),toDataURL());
+      } 	  
+    
+     function handleFileSelect(evt){
+       var file = evt.target.files[0];
+       var reader = new FileReader();
+       reader.onload = function(fileObject){
+         var data = fileObject.target.result;
+         var image = new Image();
+         image.onload = function(){
+           window.imageSrc = this;
+            redrawMeme(window.imageSrc,null,null);
+         }
+         image.src = data;
+         console.log(fileObject.target.result);
+       }
+       reader.readAsDataURL(file);
+     };
+    window.topLineText = "";
+    window.bottomLineText = "";
+    var input1 = document.getElementById('topLineText');
+    var input2 = document.getElementById('bottomLineText');
+    input1.oninput = textChangeListener;
+    input2.oninput = textChangeListener;
+    document.getElementById('file').addEventListener('change', handleFileSelect, false);
+    document.querySelector('button').addEventListener('click', saveFile, false);
+
+   	  
+   </script>
+</body>
+</html>
